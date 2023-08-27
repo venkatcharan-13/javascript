@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #a79bf6;
+    position: relative;
+}
+
+.heading {
+    background-color: #7e6bf9;
+    margin-left: 70px;
+    width: 85%;
+    text-align: center;
+}
+
+.card {
+    margin-left:100px;
+    margin-top: 15px;
+    width: 60%;
+}
+
+.card-header {
+    position: relative;
+}
+
+.card-header input {
+    height: 40px;
+    top: 23px;
+    width: 90%;
+    padding: 0 60px 0 35px;
+}
+
+.card-header .searchIcon {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+}
+
+.card-header .btn {
+    position: absolute;
+    top: 8px;
+    right: 20px;
+    background-color: #2fedf7;
+}
+
+ion-icon {
+    font-size: 20px;
+    color: black;
+}
+
+.card-body .form-control {
+    background-color: #d6d0f9;
+    margin-top: 8px;
+    color: black;
+    border: none;
+    border-bottom: 1px solid black;
+    outline: none;
+}
+
+.card-body #myTA1 {
+    border: none;
+}
+
+.autoCompletion {
+    position: absolute;
+    top:100px;
+    right: 200px;
+    z-index: 1;
+    background-color: white;
+    padding: 0;
+    max-height: 600px;
+    width: 300px;
+    overflow-y: auto;
+}
+
+.autoCompletion li {
+    list-style: none;
+    padding: 8px 12px;
+    width: 100%;
+    cursor: default;
+    border-radius: 5px;
+}
+
+#addlists li {
+    list-style: none;
+    padding: 8px 12px;
+    width: 100%;
+    cursor: default;
+    border-radius: 5px;
+    border-bottom: 1px solid;
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link for BootStrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Link for own css -->
+    <link rel="stylesheet" href="style.css">
+    <!-- link for font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+    <title>Idea Flow</title>
+</head>
+
+<body>
+    <div class="com">
+        <div class=" heading card-header shadow-lg">
+            <h5>Assignment</h5>
+        </div>
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <ion-icon class="searchIcon" name="search-outline"></ion-icon>
+                <input class="form-control" type="text" placeholder="Search">
+                <button class="btn" type="submit" onclick="addNoteBtn()"><ion-icon
+                        name="create-outline"></ion-icon></button>
+            </div>
+            <div class="card-body" id="addlists">
+                <li id="myTA1">First Idea</li>
+            </div>
+        </div>
+
+
+        <div class="card autoCompletion">
+            <div class="card-header">
+                Auto Completion
+            </div>
+            <div class="card-body">
+                <div id="autoCom">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+    <!-- Script for Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- Script for Icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <!-- Script -->
+    <script>
+        function checkBoth(spanArea, liArea) {
+            if (spanArea) {
+                return liArea.innerHTML.replace(/<span style="color: blue;">.*?<\/span>/g, '').replace(/<span style="color: red;">.*?<\/span>/g, '').replace(/<span style="color: green;">.*?<\/span>/g, '');
+
+            } else {
+                return liArea.textContent;
+            }
+        }
+
+        function toCheckContent(spanArea) {
+            if (spanArea) {
+                return true;
+
+            } else {
+                return false;
+            }
+        }
+        function checkRegrex(bol) {
+            if (bol) {
+                return /(&lt;&gt;)/;
+            } else {
+                return /(<>)/;
+            }
+        }
+
+        var tAId = 2;
+        function addNoteBtn() {
+            var targetElement = document.getElementById('addlists');
+            var texthtml = `<li contenteditable="true" id="myTA${tAId}"></li>`;
+            targetElement.insertAdjacentHTML('afterbegin', texthtml);
+            tAId++;
+        }
+
+        const myMap = new Map();
+        myMap.set('myTA1', 'First Idea');
+
+        var txtAreaId;
+        const ideasBox = document.getElementById('autoCom');
+
+        const mapDisplay = new Map();
+        mapDisplay.set('First Idea', 'First Idea');
+
+        const mapLinkDisplay = new Map();
+        mapLinkDisplay.set('First Idea', 'First Idea');
+
+        //regrex expression
+        const textPatternHtml = /(&lt;&gt;)/;
+        const textPatterntxt = /(<>)/;
+        const linkPattern = /https:\/\/www.(\w*).com/g;
+        // const linkPattern = /https?:\/\/[^\s]+/g
+        const comPattern = /(\w*).com/g;
+        const hashPattern = /#(\w)*/g;
+
+        const textareaContainer = document.getElementById('addlists');
+        textareaContainer.addEventListener('input', (event) => {
+            if (event.target.tagName === 'LI') {
+                const Htmlcontent = event.target.innerHTML;
+                const txtContent = event.target.textContent;
+                const liArea = document.getElementById(event.target.id);
+                const spanArea = liArea.querySelector('span');
+                var tempText = checkBoth(spanArea, liArea);
+
+                var bol = toCheckContent(spanArea);
+                var htmlBolAC = toCheckContent(spanArea);
+
+                var txtRegrexPattern = checkRegrex(bol);
+
+                myMap.set(event.target.id, txtContent);
+                mapLinkDisplay.set(event.target.id, Htmlcontent);
+
+                if (txtRegrexPattern.test(tempText)) {
+                    ideasBox.removeAttribute('style');
+                    const keyToSkip = event.target.id;
+                    myMap.forEach((value, key) => {
+                        if (key !== keyToSkip) {
+                            const myregex = /((\w+)\s*\w+)\s*/g;
+                            let match = myregex.exec(value);
+                            mapDisplay.set(match[1], document.getElementById(key).innerHTML);
+                        }
+                    });
+                    autoCompletion(mapDisplay, tempText, htmlBolAC);
+                    txtAreaId = event.target.id;
+                } else if (linkPattern.test(tempText)) {
+
+                    var htmlContent = mapLinkDisplay.get(event.target.id);
+                    var matches = tempText.match(linkPattern);
+                    if (matches) {
+                        var coloredLinks = matches.map(link => `<span style="color: red;">${link}</span>&nbsp;`);
+                        var modifiedHtmlContent = htmlContent.replace(linkPattern, coloredLinks);
+                        console.log(modifiedHtmlContent);
+                        document.getElementById(event.target.id).innerHTML = modifiedHtmlContent;
+                    }
+                } else if (hashPattern.test(tempText)) {
+
+                    var htmlContent = mapLinkDisplay.get(event.target.id);
+                    var matches = tempText.match(hashPattern);
+                    console.log(matches);
+                    if (matches) {
+                        var coloredLinks = matches.map(link => `<span style="color: green;">${link}</span>&nbsp;`);
+                        console.log(coloredLinks);
+                        var modifiedHtmlContent = htmlContent.replace(hashPattern, coloredLinks);
+                        // console.log(modifiedHtmlContent);
+                        document.getElementById(event.target.id).innerHTML = modifiedHtmlContent;
+                    }
+                }
+            }
+        });
+
+
+
+        function autoCompletion(lisData, value, bol) {
+            const myregexSearchTxt = /<>\s*(\w*)/g;
+            const myregexSearchHtml = /&lt;&gt;\s*(\w*)/g;
+            var nowRegex;
+            if (bol) {
+                nowRegex = myregexSearchHtml;
+            } else {
+                nowRegex = myregexSearchTxt;
+            }
+            var searchWord = nowRegex.exec(value);
+            let filteredKeys = Array.from(lisData.keys()).filter((data) => {
+                return data.toLocaleLowerCase().includes(searchWord[1].toLocaleLowerCase());
+            })
+            filteredKeys = filteredKeys.map((data) => {
+                return data = `<li id="${data}" onclick="dp(this.id)">${data} </li>`;
+            });
+            showSuggestions(filteredKeys);
+        }
+
+        function showSuggestions(list) {
+            let listData;
+            if (!list.length) {
+                listData = `<li><h4>Please Enter the valid Idea from the list</h4></li>`;
+            } else {
+                listData = list.join('');
+            }
+            ideasBox.innerHTML = listData;
+        }
+
+        function dp(id) {
+            const myregexSearch = /&lt;&gt;\s*(\w*)/g;
+            var txtId = document.getElementById(txtAreaId);
+            var tempContent = txtId.innerHTML;
+
+            let searchWord1;
+            let match;
+            while ((match = myregexSearch.exec(tempContent)) !== null) {
+                searchWord1 = match[1];
+            }
+
+            var addContent = mapDisplay.get(id);
+            var addHtmlContent = `<span style="color: blue;">&nbsp;<>${addContent}</span>&nbsp;`;
+
+            if (searchWord1.length !== 0) {
+                document.getElementById(txtAreaId).innerHTML = tempContent.slice(0, -searchWord1.length - 8) + addHtmlContent;
+                const innerhtmlTag = document.getElementById(txtAreaId).innerHTML;
+                mapDisplay.set(id, innerhtmlTag);
+                ideasBox.setAttribute('style', 'display:none');
+            } else {
+                document.getElementById(txtAreaId).innerHTML = tempContent.slice(0, -8) + addHtmlContent;
+                const innerhtmlTag = document.getElementById(txtAreaId).innerHTML;
+                mapDisplay.set(id, innerhtmlTag);
+                ideasBox.setAttribute('style', 'display:none');
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
